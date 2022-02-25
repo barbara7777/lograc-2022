@@ -3,3 +3,4 @@ include:
   agda-stdlib/src
   exercises
   testing
+  solutions
