@@ -35,6 +35,7 @@ module Ex1 where
 -}
 
 
+{- This is \::  cool -}
 ------------------
 -- Exercise 1 --
 ------------------
@@ -63,7 +64,15 @@ data Bool : Set where
 -}
 
 _⊕_ : Bool → Bool → Bool
-b ⊕ b' = {!!}
+true ⊕ true = false
+true ⊕ false = true
+false ⊕ true = true
+false ⊕ false = false
+
+
+novo : Bool
+novo = false ⊕ (true ⊕ false)
+
 
 {-
    You can test whether your definition computes correctly by using
@@ -95,7 +104,7 @@ data ℕ : Set where
 -}
 
 incr : ℕ → ℕ
-incr n = {!!}
+incr n = suc n
 
 {-
    Define a function that decrements a number by one. Give the definition
@@ -103,7 +112,8 @@ incr n = {!!}
 -}
 
 decr : ℕ → ℕ
-decr n = {!!}
+decr zero = zero
+decr (suc n) = n
 
 {-
    Define a function that triples the value of a given number.
@@ -111,7 +121,9 @@ decr n = {!!}
 -}
 
 triple : ℕ → ℕ
-triple n = {!!}
+triple zero = zero
+triple (suc zero) = suc (suc (suc zero))
+triple (suc n) = suc (suc (suc (triple n)))
 
 
 ----------------
@@ -142,7 +154,8 @@ infixl 7  _*_
 -}
 
 _^_ : ℕ → ℕ → ℕ
-m ^ n = {!!}
+m ^ zero = suc zero
+m ^ suc n = n * (m ^ n)
 
 infixl 8  _^_
 
@@ -178,7 +191,9 @@ infixl 20 _I
 -}
 
 b-incr : Bin → Bin
-b-incr b = {!!}
+b-incr ⟨⟩ = ⟨⟩ I
+b-incr (b O) = b I
+b-incr (b I) = (b-incr b) O
 
 
 ----------------
@@ -195,11 +210,22 @@ b-incr b = {!!}
 -}
 
 to : ℕ → Bin
-to n = {!!}
+to zero = ⟨⟩ O
+to (suc n) = b-incr (to n)
 
 from : Bin → ℕ
-from b = {!!}
+from b = from-aux b 0
+   where
+      from-aux : Bin → ℕ → ℕ
+      from-aux ⟨⟩ n = n
+      from-aux (b O) n = 2 * (from-aux b n)  
+      from-aux (b I) n = 1 + 2 * (from-aux b n)  
 
+{- KRAJSE:
+from2 : Bin → ℕ
+from2 ⟨⟩ = 0
+from2 (b O) = 2 * (from2 b)
+from2 (b I) = 1 + 2 * (from2 b) -}
 
 ----------------
 -- Exercise 6 --
@@ -218,6 +244,8 @@ data Even : ℕ → Set where
 -}
 
 data Even₂ : Bin → Set where
+   even₂ : {b : Bin} → Even₂ (b O)
+   
   {- EXERCISE: add the constructors for this inductive predicate here -}
 
 
@@ -231,7 +259,16 @@ data Even₂ : Bin → Set where
 -}
 
 to-even : {n : ℕ} → Even n → Even₂ (to n)
-to-even p = {!!}
+-- podatki, ki jih imamo v prvem primeru: p = even-z, p : Even n, zero-z : Even zero ==> n = zero
+to-even even-z = even₂   -- tu je edina mozna vrednost za n kar zero
+to-even (even-ss p) = to-even-aux (to-even p)
+   where 
+      to-even-aux : {b : Bin} → Even₂ b → Even₂ (b-incr (b-incr b))
+      to-even-aux even₂ = even₂
+
+-- ko bodo naslednje vaje konec, bo objavil resitve
+-- priporoca, da sami nardimo vaje do konca
+-- kmal bojo stvari postale tezje heh
 
 
 ----------------
@@ -251,7 +288,13 @@ to-even p = {!!}
    `NonEmptyBin ⟨⟩` should not be inhabited.
 -}
 
+{- data Even₂ : Bin → Set where
+   even₂ : {b : Bin} → Even₂ (b O) -}
+
 data NonEmptyBin : Bin → Set where
+   nonEmpty-O : {b : Bin} → NonEmptyBin (b O) 
+   nonEmpty-I : {b : Bin} → NonEmptyBin (b I) 
+
   {- EXERCISE: add the constructors for this inductive predicate here -}
 
 {-
@@ -263,8 +306,8 @@ data NonEmptyBin : Bin → Set where
 data ⊥ : Set where
 
 ⟨⟩-empty : NonEmptyBin ⟨⟩ → ⊥
-⟨⟩-empty p = {!!}
-
+⟨⟩-empty ()
+{- Obstaja samo ena preslikava iz prazne mnozice kamorkoli... -}
 
 ----------------
 -- Exercise 9 --
@@ -279,8 +322,21 @@ data ⊥ : Set where
    need a case for the binary number argument being `⟨⟩` any more.
 -}
 
+
+{- PREJ:
+from2 : Bin → ℕ
+from2 ⟨⟩ = 0
+from2 (b O) = 2 * (from2 b)
+from2 (b I) = 1 + 2 * (from2 b) -}
+
+
 from-ne : (b : Bin) → NonEmptyBin b → ℕ
-from-ne b p = {!!}
+from-ne (⟨⟩ O) nonEmpty-O = 0
+from-ne (⟨⟩ I) nonEmpty-I = 1
+from-ne (b O O) nonEmpty-O = 2 * from-ne (b O) nonEmpty-O  
+from-ne (b I O) nonEmpty-O = 2 * from-ne (b I) nonEmpty-I  
+from-ne (b I I) nonEmpty-I = 1 + 2 * from-ne (b I) nonEmpty-I   
+from-ne (b O I) nonEmpty-I = 1 + 2 * from-ne (b O) nonEmpty-O   
 
 
 -----------------
@@ -313,7 +369,8 @@ infixr 5 _∷_
 -}
 
 map : {A B : Set} → (A → B) → List A → List B
-map f xs = {!!}
+map f [] = []
+map f (x ∷ xs) = (f x) ∷ (map f xs)
 
 
 -----------------
@@ -325,7 +382,8 @@ map f xs = {!!}
 -}
 
 length : {A : Set} → List A → ℕ
-length xs = {!!}
+length [] = 0
+length (x ∷ xs) = 1 + length xs
 
 -----------------
 -- Exercise 12 --
@@ -346,7 +404,8 @@ data _≡ᴺ_ : ℕ → ℕ → Set where
 -}
 
 map-≡ᴺ : {A B : Set} {f : A → B} → (xs : List A) → length xs ≡ᴺ length (map f xs)
-map-≡ᴺ xs = {!!}
+map-≡ᴺ [] = z≡ᴺz
+map-≡ᴺ (x ∷ xs) = s≡ᴺs (map-≡ᴺ xs)  {- ????? -}
 
 
 -----------------
@@ -370,6 +429,8 @@ infix 4 _≤_
 -}
 
 data _≤ᴸ_ {A : Set} : List A → List A → Set where
+   ≤-[] : {s : List A} → [] ≤ᴸ s
+   ≤-s : {e1 e2 : A} → {s1 s2 : List A} → s1 ≤ᴸ s2 → e1 ∷ s1 ≤ᴸ e2 ∷ s2  
   {- EXERCISE: add the constructors for this inductive relation here -}
 
 infix 4 _≤ᴸ_
@@ -385,10 +446,21 @@ infix 4 _≤ᴸ_
 -}
 
 length-≤ᴸ-≦ : {A : Set} {xs ys : List A} → xs ≤ᴸ ys → length xs ≤ length ys
-length-≤ᴸ-≦ p = {!!}
+length-≤ᴸ-≦ ≤-[] = z≤n
+length-≤ᴸ-≦ (≤-s p) = s≤s (length-≤ᴸ-≦ p)
 
 length-≤-≦ᴸ : {A : Set} (xs ys : List A) → length xs ≤ length ys → xs ≤ᴸ ys
-length-≤-≦ᴸ xs ys p = {!!}
+length-≤-≦ᴸ [] ys z≤n = ≤-[]
+length-≤-≦ᴸ (x ∷ xs) (y ∷ ys) (s≤s p) = ≤-s (length-≤-≦ᴸ xs ys p)
+
+
+{- length-≤ᴸ-≦ : {A : Set} {xs ys : List A} → xs ≤ᴸ ys → length xs ≤ length ys
+length-≤ᴸ-≦ []≤ᴸxs   = z≤n
+length-≤ᴸ-≦ (∷≤ᴸ∷ p) = s≤s (length-≤ᴸ-≦ p)
+
+length-≤-≦ᴸ : {A : Set} (xs ys : List A) → length xs ≤ length ys → xs ≤ᴸ ys
+length-≤-≦ᴸ []       ys       z≤n     = []≤ᴸxs
+length-≤-≦ᴸ (x ∷ xs) (y ∷ ys) (s≤s p) = ∷≤ᴸ∷ (length-≤-≦ᴸ xs ys p) -}
 
 
 -----------------
@@ -405,3 +477,4 @@ length-≤-≦ᴸ xs ys p = {!!}
    - "less than or equal" order
    - show that `from` takes even numbers to even numbers
 -}
+  
