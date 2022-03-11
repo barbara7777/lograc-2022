@@ -68,7 +68,8 @@ postulate fun-ext : ∀ {a b} → Extensionality a b
 -}
 
 take-n : {A : Set} {n m : ℕ} → Vec A (n + m) → Vec A n
-take-n xs = {!!}
+take-n {n = zero} xs = []
+take-n {n = suc n'} (x ∷ xs) = x ∷ take-n {n = n'} xs
 
 {-
    Now define a function that extracts the first `n` elements from a
@@ -82,7 +83,7 @@ take-n xs = {!!}
 -}
 
 take-n' : {A : Set} {n m : ℕ} → Vec A (m + n) → Vec A n
-take-n' xs = {!!}
+take-n' {A} {n = n} {m = m} xs = take-n (subst (Vec A) (+-comm m n) xs) 
 
 
 ----------------
@@ -116,8 +117,15 @@ list-vec (x ∷ xs) = x ∷ list-vec xs
 
 list-vec-list : {A : Set}
               → vec-list ∘ list-vec ≡ id {A = List A}
+ 
+list-vec-list = fun-ext pomozni-dokaz
+   where
+      pomozni-dokaz : {A : Set} (x : List A) → vec-list (list-vec x) ≡ x
+      pomozni-dokaz {A} [] = refl
+      pomozni-dokaz {A} (x ∷ xs) = cong ((x ∷_)) (pomozni-dokaz xs)  -- cong {!   !} (cong (x ∷_) {!   !}) 
 
-list-vec-list = {!!}
+{- f = g 
+x -> fx = gx -}
 
 {-
    Note: The dual lemma, showing that `list-vec` is the left inverse
@@ -155,8 +163,8 @@ lookup-total-Σ : {A : Set} {n : ℕ}
                → i < n
                → Σ[ x ∈ A ] (lookup xs i ≡ just x)
 
-lookup-total-Σ xs i p = {!!}
-
+lookup-total-Σ (x ∷ xs) zero p = x , refl
+lookup-total-Σ (x ∷ xs) (suc i) (s≤s p) = lookup-total-Σ xs i p
 
 ----------------
 -- Exercise 4 --
@@ -173,7 +181,8 @@ lookup-total-Σ xs i p = {!!}
 -}
 
 vec-list-Σ : {A : Set} {n : ℕ} → Vec A n → Σ[ xs ∈ List A ] (length xs ≡ n)
-vec-list-Σ xs = {!!}
+vec-list-Σ {n = zero} xs = [] , refl
+vec-list-Σ {n = suc n} (x ∷ xs) = x ∷ proj₁ (vec-list-Σ xs) , cong suc (proj₂ (vec-list-Σ xs))
 
 
 ----------------
@@ -199,7 +208,9 @@ list-ext : {A : Set} {xs ys : List A}
               → safe-list-lookup xs i p ≡ safe-list-lookup ys i q)
          → xs ≡ ys
 
-list-ext = {!!}
+list-ext {xs = []} {ys = []} l d = refl
+list-ext {A} {xs = x ∷ xs'} {ys = y ∷ ys'} l d = list-ext {!   !} d  
+
 
 {-
    Notice that we have generalised this statement a bit compared
@@ -462,3 +473,4 @@ open import Data.Nat.Properties
 
 from-bin-≡ : (b : Bin) → from-bin b ≡ from-bin' b
 from-bin-≡ b = {!!}
+  

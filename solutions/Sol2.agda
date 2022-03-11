@@ -296,9 +296,10 @@ lookup-correct : {A : Set} {n : ℕ}
 lookup-correct (x ∷ xs) zero (s≤s p) =
   begin
     lookup (x ∷ xs) zero
-  ≡⟨⟩
+  ≡⟨ refl ⟩
     just (safe-lookup (x ∷ xs) (nat-to-fin zero (s≤s p)))
   ∎
+
 lookup-correct (x ∷ xs) (suc i) (s≤s p) =
   begin
     lookup (x ∷ xs) (suc i)
